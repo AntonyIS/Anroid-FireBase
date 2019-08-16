@@ -7,10 +7,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 import java.util.ArrayList;
 
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class CustomAdapter extends BaseAdapter {
     Context mContext;
@@ -41,19 +46,28 @@ public class CustomAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.item_layout, parent,false);//modify here
             viewHolder = new ViewHolder();
             //modify this block of code
-            viewHolder.mName = (TextView) convertView.findViewById(R.id.tvName);
-            viewHolder.mEmail = (TextView) convertView.findViewById(R.id.tvEmail);
-            viewHolder.mPassword = (TextView) convertView.findViewById(R.id.tvPassword);
+            viewHolder.mName = convertView.findViewById(R.id.tvName);
+            viewHolder.mEmail = convertView.findViewById(R.id.tvEmail);
+            viewHolder.mPassword =  convertView.findViewById(R.id.tvPassword);
+            viewHolder.mBtnDelete =  convertView.findViewById(R.id.btnDelete);
             //Up to here
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         //MODIFY THIS BLOCK OF CODE
-        Item person = data.get(position);//modify here
+        final Item person = data.get(position);//modify here
         viewHolder.mName.setText(person.getName());//modify here
         viewHolder.mEmail.setText(person.getEmail());//modify here
         viewHolder.mPassword.setText(person.getPassword());//modify here
+        viewHolder.mBtnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Users/"+person.getId());
+                ref.removeValue();
+                Toast.makeText(mContext, "Deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
         return convertView;
 
     }
@@ -61,6 +75,7 @@ public class CustomAdapter extends BaseAdapter {
         TextView mName;
         TextView mEmail;
         TextView mPassword;
+        Button mBtnDelete;
     }
 
 }
